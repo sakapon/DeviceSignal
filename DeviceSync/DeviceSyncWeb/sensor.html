@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>DeviceSync - Sensor</title>
+    <script type="text/javascript" src="/Scripts/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery.signalR-2.4.0.min.js"></script>
+    <script type="text/javascript" src="/signalr/hubs"></script>
+    <style type="text/css">
+        .container {
+            width: 2px;
+            height: 2px;
+            margin: 100px auto;
+            perspective: 300px;
+        }
+
+        #cube {
+            transform-style: preserve-3d;
+        }
+
+        .face {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            left: -50px;
+            top: -50px;
+            background: rgba(255, 102, 0, 0.5);
+            border: 2px solid gray;
+            text-align: center;
+            font-size: 60px;
+            line-height: 100px;
+        }
+
+        .front {
+            transform: translateZ(50px);
+        }
+
+        .back {
+            transform: rotateY(180deg) translateZ(50px);
+        }
+
+        .right {
+            transform: rotateY(90deg) translateZ(50px);
+        }
+
+        .left {
+            transform: rotateY(-90deg) translateZ(50px);
+        }
+
+        .top {
+            transform: rotateX(90deg) translateZ(50px);
+        }
+
+        .bottom {
+            transform: rotateX(-90deg) translateZ(50px);
+        }
+    </style>
+</head>
+<body>
+    <div id="log"></div>
+
+    <div class="container">
+        <div id="cube">
+            <div class="face front">1</div>
+            <div class="face back">6</div>
+            <div class="face right">2</div>
+            <div class="face left">5</div>
+            <div class="face top">3</div>
+            <div class="face bottom">4</div>
+        </div>
+    </div>
+
+    <img id="image" src="website_news.png" style="margin: 80px;" />
+
+    <script type="text/javascript">
+        var sensorHub = $.connection.sensorHub;
+        $.connection.hub.start();
+
+        var logEl = document.querySelector("#log");
+        var cubeEl = document.querySelector("#cube");
+        var imageEl = document.querySelector("#image");
+
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", function (e) {
+                sensorHub.server.updateOrientation(e.alpha, e.beta, e.gamma);
+
+                logEl.innerHTML = `alpha: ${e.alpha}<br />beta: ${e.beta}<br />gamma: ${e.gamma}`;
+                var rotation = `rotateZ(${-e.alpha}deg) rotateX(${-e.beta}deg) rotateY(${e.gamma}deg)`;
+                cubeEl.style.transform = rotation;
+                imageEl.style.transform = rotation;
+            });
+        }
+    </script>
+
+    <ul>
+        <li><a href="viewer.html">Viewer</a></li>
+    </ul>
+</body>
+</html>
