@@ -77,12 +77,17 @@
         var sensorHub = $.connection.sensorHub;
         $.connection.hub.start();
 
+        var previousTime = new Date().getTime();
         var logEl = document.querySelector("#log");
         var cubeEl = document.querySelector("#cube");
         var imageEl = document.querySelector("#image");
 
         if (window.DeviceOrientationEvent) {
             window.addEventListener("deviceorientation", function (e) {
+                var now = new Date().getTime();
+                if (now - previousTime < 70) return;
+                previousTime = now;
+
                 sensorHub.server.updateOrientation(e.alpha, e.beta, e.gamma);
 
                 logEl.innerHTML = `alpha: ${e.alpha}<br />beta: ${e.beta}<br />gamma: ${e.gamma}`;
